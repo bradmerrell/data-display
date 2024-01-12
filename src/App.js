@@ -88,11 +88,16 @@ const App = () => {
   };
 
   const getBackgroundImage = (data, primaryOpp) => {
-    var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
-    var market = projectRow["Primary Market"];
-    var bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
-    if (bgImage === undefined) {
-      bgImage = 'Slalom.png';
+    var bgImage = 'Slalom.png';
+    if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {      
+      var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
+      var market = projectRow["Primary Market"];
+      if (market !== undefined) {        
+        bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
+        if (bgImage === undefined) {
+          bgImage = 'Slalom.png';
+        }
+      }
     }
     return `url(${process.env.PUBLIC_URL}/backgrounds/${bgImage})`
   };

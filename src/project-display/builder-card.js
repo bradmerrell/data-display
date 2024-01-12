@@ -7,7 +7,7 @@ const BuilderCard = ({ builders }) => {
 
   const cardStyle = {
     marginTop: '16px',
-    background: 'rgba(255, 255, 255, 0.65)', // 50% transparent white background
+    background: 'rgba(255, 255, 255, 0.66)', // 50% transparent white background
   };
 
   return (

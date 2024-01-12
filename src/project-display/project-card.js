@@ -26,7 +26,7 @@ const ProjectCard = ({ project }) => {
                                     src={`${process.env.PUBLIC_URL}/logos/${project["Client"]}.png`} 
                                     alt="Logo" 
                                     onError={handleImageError}
-                                    style={{ maxWidth: '100%', height: 'auto' }}
+                                    style={{ maxWidth: '100%', height: '200px' }}
                                 />
                             </Box>
                             <Typography variant="h4" style={{ textAlign: 'center' }}>

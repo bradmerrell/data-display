@@ -50,7 +50,6 @@ const backgroundImageList = ["Atlanta.png",
 const App = () => {
   const [data, setData] = useState([]);
   const [primaryOpps, setPrimaryOpps] = useState([]);
-  const [backgroundImage, setBackgroundImage] = useState('');
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [lastBC, setLastBC] = useState(null); // to track the last fetched BC
   const [seq, setSeq] = useState(0); // Using state to manage 'seq'
@@ -88,6 +87,17 @@ const App = () => {
     return projectRow;
   };
 
+  const getBackgroundImage = (data, primaryOpp) => {
+    var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
+    var market = projectRow["Primary Market"];
+    var backgroundImage = backgroundImageList.find(bg=> bg === `${market}.png`)
+    if (backgroundImage === undefined) {
+      backgroundImage = 'Slalom.png';
+    }
+    return `url(${process.env.PUBLIC_URL}/backgrounds/${backgroundImage})`
+    //setBackgroundImage(backgroundImage);    
+  };
+
   const getListOfBuilders = (data, primaryOpp) => {
     var builders = data
       .filter(row => row["Primary Opp"] === primaryOpp)
@@ -109,24 +119,6 @@ const App = () => {
     const timer = setInterval(updateSeq, timer_ms); // Update every 5 seconds
     return () => clearInterval(timer); // Clear the interval on component unmount
   }, [updateSeq, timer_ms]);
-
-  const updateBackground = useCallback(() => {
-    // Randomly select a background image
-    const randomIndex = Math.floor(Math.random() * backgroundImageList.length);
-    setBackgroundImage(backgroundImageList[randomIndex]);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(updateBackground, timer_ms); // Update every 5 seconds
-    return () => clearInterval(timer); // Clear the interval on component unmount
-  }, [updateBackground, timer_ms]);
-
-  
-  useEffect(() => {
-    // Randomly select a background image
-    const randomIndex = Math.floor(Math.random() * backgroundImageList.length);
-    setBackgroundImage(backgroundImageList[randomIndex]);
-  }, []);
 
   useEffect(() => {
     // Function to fetch data
@@ -176,7 +168,8 @@ const App = () => {
   } 
 
   return (    
-    <div style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/backgrounds/${backgroundImage})`,
+    // <div style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/backgrounds/${backgroundImage})`,
+    <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover', // or 'contain' depending on your needs
                   backgroundPosition: 'center',

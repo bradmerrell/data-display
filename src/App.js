@@ -90,12 +90,11 @@ const App = () => {
   const getBackgroundImage = (data, primaryOpp) => {
     var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
     var market = projectRow["Primary Market"];
-    var backgroundImage = backgroundImageList.find(bg=> bg === `${market}.png`)
-    if (backgroundImage === undefined) {
-      backgroundImage = 'Slalom.png';
+    var bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
+    if (bgImage === undefined) {
+      bgImage = 'Slalom.png';
     }
-    return `url(${process.env.PUBLIC_URL}/backgrounds/${backgroundImage})`
-    //setBackgroundImage(backgroundImage);    
+    return `url(${process.env.PUBLIC_URL}/backgrounds/${bgImage})`
   };
 
   const getListOfBuilders = (data, primaryOpp) => {

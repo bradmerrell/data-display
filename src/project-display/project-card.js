@@ -13,6 +13,7 @@ const ProjectCard = ({ project }) => {
             imageRef.current.style.display = ''; // Reset the display property when project changes
         }
     }, [project]);
+    
 
     return (
         <div style={{ padding: '20px' }}>    
@@ -26,7 +27,7 @@ const ProjectCard = ({ project }) => {
                                     src={`${process.env.PUBLIC_URL}/logos/${project["Client"]}.png`} 
                                     alt="Logo" 
                                     onError={handleImageError}
-                                    style={{ maxWidth: '100%', height: '200px' }}
+                                    style={{ maxWidth: '100%', height: '150px' }}
                                 />
                             </Box>
                             <Typography variant="h4" style={{ textAlign: 'center' }}>

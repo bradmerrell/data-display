@@ -5,9 +5,14 @@ const BuilderCard = ({ builders }) => {
   const numColumns = builders.length > 10 ? 2 : 1;
   console.log("numColumns:",numColumns);
 
+  const cardStyle = {
+    marginTop: '16px',
+    background: 'rgba(255, 255, 255, 0.65)', // 50% transparent white background
+  };
+
   return (
     <div style={{ padding: '20px' }} >
-        <Card style={{ marginTop: '16px' }}>
+        <Card style={cardStyle}>
             <CardContent>
                 <Typography variant="h6" component="div" style={{ textAlign: 'center' }}>
                     Builders

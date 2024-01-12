@@ -24,7 +24,7 @@ const ProjectCard = ({ project }) => {
                             <Box textAlign="center">
                                 <img       
                                     ref={imageRef}                      
-                                    src={`${process.env.PUBLIC_URL}/logos/${project["Client"]}.png`} 
+                                    src={`${process.env.REACT_APP_PUBLIC_URL}/logos/${project["Client"]}.png`} 
                                     alt="Logo" 
                                     onError={handleImageError}
                                     style={{ maxWidth: '100%', height: '150px' }}

@@ -173,7 +173,6 @@ const App = () => {
   } 
 
   return (    
-    // <div style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/backgrounds/${backgroundImage})`,
     <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover', // or 'contain' depending on your needs

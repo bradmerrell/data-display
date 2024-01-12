@@ -138,6 +138,7 @@ const App = () => {
         setIsLoading(false);
       } else {
         try {
+          console.log("Data Url:", process.env.REACT_APP_DATA_API_GET)
           var url = `${process.env.REACT_APP_DATA_API_GET}`;
           if (bc != null && bc.length > 0) {
             url = url + `&BC=${bc}`;

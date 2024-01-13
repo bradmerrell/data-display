@@ -3,7 +3,6 @@ import { Card, CardContent, Typography, List, ListItem } from '@mui/material';
 
 const BuilderCard = ({ builders }) => {
   const numColumns = builders.length > 10 ? 2 : 1;
-  console.log("numColumns:",numColumns);
 
   const cardStyle = {
     marginTop: '16px',

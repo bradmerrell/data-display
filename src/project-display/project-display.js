@@ -4,8 +4,8 @@ import BuilderCard from './builder-card';
 import ProjectCard from './project-card';
 
 const ProjectDisplay = ({ projectRow, builderList }) => {
-  console.log("project:", projectRow);
-  console.log("builders:", builderList);
+  // console.log("project:", projectRow);
+  // console.log("builders:", builderList);
   return (
     <Grid container spacing={2}>
         <Grid item xs={12}>

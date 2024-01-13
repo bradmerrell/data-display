@@ -112,8 +112,7 @@ const App = () => {
   
   const fetchData = useCallback(async () => {
     setIsLoading(true);
-    try {
-      console.log("Data Url:", process.env.REACT_APP_DATA_API_GET)
+    try {      
       var url = `${process.env.REACT_APP_DATA_API_GET}`;
       if (bc != null && bc.length > 0) {
         url = url + `&BC=${bc}`;
@@ -128,7 +127,8 @@ const App = () => {
       setPrimaryOpps(getDistinctPrimaryOpps(response.data));
       localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(response.data)));
       setLastBC(bc); // Update lastBC after successful fetch  
-      localStorage.setItem('staffing.showcase.lastBC', bc);           
+      localStorage.setItem('staffing.showcase.lastBC', bc); 
+      setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -139,12 +139,12 @@ const App = () => {
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
     setSeq(prevSeq => {
-      if ((prevSeq + 1) >= primaryOpps.length)
+      if ((prevSeq + 1) > primaryOpps.length)
       {
         return prevSeq;
       }
       const nextSeq = (prevSeq + 1) % primaryOpps.length;
-      return nextSeq === 0 ? 1 : nextSeq; // Resets to 1 when it exceeds the length
+      return nextSeq === 0 ? 0 : nextSeq; // Resets to 1 when it exceeds the length
     });
   }, [primaryOpps.length]);
 
@@ -178,9 +178,8 @@ const App = () => {
 
     // New useEffect for refreshing data when seq resets
   useEffect(() => {    
-    if (seq + 1 === primaryOpps.length) {
+    if (seq > primaryOpps.length) {
       fetchData();
-      setSeq(0);
     }
   }, [seq, primaryOpps, fetchData]);
 

@@ -15,7 +15,6 @@ const FileUploadDialog = ({ open, onClose }) => {
       formData.append('file', file);
 
       try {
-        console.log("Upload Url:", process.env.REACT_APP_DATA_API_UPLOAD)
         await axios.post(process.env.REACT_APP_DATA_API_UPLOAD, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',

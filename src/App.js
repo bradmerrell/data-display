@@ -110,10 +110,39 @@ const App = () => {
     return builders;
   };
   
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      console.log("Data Url:", process.env.REACT_APP_DATA_API_GET)
+      var url = `${process.env.REACT_APP_DATA_API_GET}`;
+      if (bc != null && bc.length > 0) {
+        url = url + `&BC=${bc}`;
+      }
+      const response = await axios.get(url, {
+        headers: {
+            'x-api-key': process.env.REACT_APP_DATA_API_KEY
+        }
+      });          
+      setData(response.data);
+      localStorage.setItem('staffing.showcase.data', JSON.stringify(response.data));
+      setPrimaryOpps(getDistinctPrimaryOpps(response.data));
+      localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(response.data)));
+      setLastBC(bc); // Update lastBC after successful fetch  
+      localStorage.setItem('staffing.showcase.lastBC', bc);           
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [bc]); // Add necessary dependencies
 
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
     setSeq(prevSeq => {
+      if ((prevSeq + 1) >= primaryOpps.length)
+      {
+        return prevSeq;
+      }
       const nextSeq = (prevSeq + 1) % primaryOpps.length;
       return nextSeq === 0 ? 1 : nextSeq; // Resets to 1 when it exceeds the length
     });
@@ -126,7 +155,7 @@ const App = () => {
 
   useEffect(() => {
     // Function to fetch data
-    const fetchData = async (forceDataRefresh) => {
+    const fetchData = async () => {
       setIsLoading(true);
       const cachedData = localStorage.getItem('staffing.showcase.data');
       const cachedPrimaryOpps = localStorage.getItem('staffing.showcase.primaryOpps');
@@ -137,36 +166,23 @@ const App = () => {
         setLastBC(cachedLastBC); // Update lastBC after successful fetch             
         setIsLoading(false);
       } else {
-        try {
-          console.log("Data Url:", process.env.REACT_APP_DATA_API_GET)
-          var url = `${process.env.REACT_APP_DATA_API_GET}`;
-          if (bc != null && bc.length > 0) {
-            url = url + `&BC=${bc}`;
-          }
-          const response = await axios.get(url, {
-            headers: {
-                'x-api-key': process.env.REACT_APP_DATA_API_KEY
-            }
-          });          
-          setData(response.data);
-          localStorage.setItem('staffing.showcase.data', JSON.stringify(response.data));
-          setPrimaryOpps(getDistinctPrimaryOpps(response.data));
-          localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(response.data)));
-          setLastBC(bc); // Update lastBC after successful fetch  
-          localStorage.setItem('staffing.showcase.lastBC', bc);           
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        } finally {
-          setIsLoading(false);
-        }
+        fetchData();
      }
-  };
+    };
 
     // Fetch data only if it's not already loaded or BC query param changes
     if (!data.length || bc !== lastBC) {      
         fetchData();
     }
-  }, [bc,data,lastBC]);
+  }, [bc,data,lastBC, fetchData]);
+
+    // New useEffect for refreshing data when seq resets
+  useEffect(() => {    
+    if (seq + 1 === primaryOpps.length) {
+      fetchData();
+      setSeq(0);
+    }
+  }, [seq, primaryOpps, fetchData]);
 
   if (isLoading) {    
     return <div>Loading...</div>; // Or any other loading indicator
@@ -181,10 +197,14 @@ const App = () => {
                   width: '100vw' // Adjust the width as needed
               }}> 
       <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6">Builder Staffed</Typography>
-          <Button color="inherit" onClick={handleMenuClick}>Upload</Button>
-          {/* Add additional menu items as needed */}
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            <Typography variant="h6">Build Project Showcase</Typography>
+          </div>
+          <div>
+            <Button color="inherit" onClick={handleMenuClick}>Upload</Button>
+            {/* Add additional menu items as needed */}
+          </div>
         </Toolbar>
       </AppBar>
       {/* File Upload Dialog */}

@@ -63,7 +63,7 @@ const App = () => {
     setIsDialogOpen(false);
   };
 
-  const timer_ms = 5000;
+  const timer_ms = 8000;
 
   const query = useQuery();
   // Retrieve BC parameter only once during the component's mounting
@@ -110,7 +110,7 @@ const App = () => {
     return builders;
   };
   
-  const fetchData = useCallback(async () => {
+  const refreshData = useCallback(async () => {
     setIsLoading(true);
     try {      
       var url = `${process.env.REACT_APP_DATA_API_GET}`;
@@ -166,22 +166,22 @@ const App = () => {
         setLastBC(cachedLastBC); // Update lastBC after successful fetch             
         setIsLoading(false);
       } else {
-        fetchData();
-     }
+        refreshData();
+      }
     };
 
     // Fetch data only if it's not already loaded or BC query param changes
     if (!data.length || bc !== lastBC) {      
-        fetchData();
+      fetchData();
     }
-  }, [bc,data,lastBC, fetchData]);
+  }, [bc,data,lastBC, refreshData]);
 
     // New useEffect for refreshing data when seq resets
   useEffect(() => {    
     if (seq > primaryOpps.length) {
-      fetchData();
+      refreshData();
     }
-  }, [seq, primaryOpps, fetchData]);
+  }, [seq, primaryOpps, refreshData]);
 
   if (isLoading) {    
     return <div>Loading...</div>; // Or any other loading indicator

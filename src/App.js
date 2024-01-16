@@ -258,8 +258,16 @@ const App = () => {
             }            
           </div>
           <div>
-            <Button color="inherit" onClick={handleMenuClick}>Upload</Button>
-            {/* Add additional menu items as needed */}
+            <Button color="inherit" onClick={handleMenuClick}>
+              <img                          
+                  src={`${process.env.REACT_APP_PUBLIC_URL}/images/upload.png`} 
+                  alt="Upload" 
+                  style={{
+                      maxWidth: '100%',
+                      height: '25px',                
+                    }}
+              />
+            </Button>            
           </div>
         </Toolbar>
       </AppBar>

@@ -53,8 +53,9 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [lastBC, setLastBC] = useState(null); // to track the last fetched BC
   const [seq, setSeq] = useState(0); // Using state to manage 'seq'
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog  
+  const [builderCount, setBuilderCount]= useState(0);
+  const [bcCount, setBcCount]= useState(0);
   const handleMenuClick = () => {
     setIsDialogOpen(true);
   };
@@ -109,6 +110,47 @@ const App = () => {
       .map(row => `${row["Name"]} (${row["Capability"]}) - [${row["Physical Location"]}]`);
     return builders;
   };
+
+  const getBuilderCount = (data, bc) => {    
+    var arrBC = [];
+    if (bc != null && bc.trim() !== "") {
+      arrBC = bc.split(',');            
+    } 
+
+    // Create a set to store unique values of the specified field
+    const uniqueValues = new Set();
+    // Iterate through the array and add the field values to the set        
+
+    data.forEach(item => {
+      if (item["Primary Opp"] !== 'NO PRIMARY') {
+          if (arrBC.length > 0) {
+            if (arrBC.indexOf(item["BC"]) !== -1) {
+              uniqueValues.add(item["Name"]);  
+            }              
+          } else {
+            uniqueValues.add(item["Name"]);
+          }
+      }
+    });
+    // Calculate the distinct count
+    return uniqueValues.size;     
+  }
+
+  const getBuildCenterCount = (data, bc) => {
+    if (bc != null && bc.trim() !== "") {
+      const arrBC = bc.split(',');        
+      return arrBC.length; 
+    } else {
+      // Create a set to store unique values of the specified field
+      const uniqueValues = new Set();
+      // Iterate through the array and add the field values to the set
+      data.forEach(item => {
+        uniqueValues.add(item["BC"]);
+      });
+      // Calculate the distinct count
+      return uniqueValues.size; 
+    }
+  }
   
   const refreshData = useCallback(async () => {
     setIsLoading(true);
@@ -127,7 +169,10 @@ const App = () => {
       setPrimaryOpps(getDistinctPrimaryOpps(response.data));
       localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(response.data)));
       setLastBC(bc); // Update lastBC after successful fetch  
-      localStorage.setItem('staffing.showcase.lastBC', bc); 
+      localStorage.setItem('staffing.showcase.lastBC', bc);    
+      console.log("bc:", bc);
+      setBcCount(getBuildCenterCount(response.data, bc));    
+      setBuilderCount(getBuilderCount(response.data, bc));      
       setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -163,7 +208,10 @@ const App = () => {
       if (bc === cachedLastBC && cachedData && cachedData.length > 0) {
         setData(JSON.parse(cachedData));
         setPrimaryOpps(JSON.parse(cachedPrimaryOpps))
-        setLastBC(cachedLastBC); // Update lastBC after successful fetch             
+        setLastBC(cachedLastBC); // Update lastBC after successful fetch    
+        console.log("bc:", bc);
+        setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));
+        setBuilderCount(getBuilderCount(JSON.parse(cachedData), bc));         
         setIsLoading(false);
       } else {
         refreshData();
@@ -200,6 +248,15 @@ const App = () => {
           <div>
             <Typography variant="h6">Build Project Showcase</Typography>
           </div>
+          <div style={{ textAlign: 'center' }}>
+            <Typography variant="h6" style={{ textAlign: 'center' }}>
+              <strong>{primaryOpps.length} projects, {builderCount} builders, {bcCount} build centers</strong>
+            </Typography>  
+            { (bc.trim().length > 0) ? (
+              <Typography variant="h8" style={{ textAlign: 'center' }}> {lastBC} </Typography>
+              ) : ( "" )
+            }            
+          </div>
           <div>
             <Button color="inherit" onClick={handleMenuClick}>Upload</Button>
             {/* Add additional menu items as needed */}
@@ -211,7 +268,9 @@ const App = () => {
       {isLoading ? (
           <div>Loading...</div>
         ) : data && data.length > 0 ? (
-            <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} />                
+            <div>
+              <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} primaryOps={ primaryOpps} buildCenters={lastBC} />              
+            </div>
         ) : (
             <div>No data available.</div>
         )

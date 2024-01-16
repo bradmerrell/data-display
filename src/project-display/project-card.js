@@ -16,7 +16,7 @@ const ProjectCard = ({ project }) => {
     
 
     return (
-        <div style={{ padding: '20px' }}>    
+        <div style={{ padding: '30px' }}>    
             <Card style={{ marginTop: '16px' }}>            
                 <CardContent>            
                     <Grid container spacing={2}>

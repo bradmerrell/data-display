@@ -13,11 +13,15 @@ const ProjectCard = ({ project }) => {
             imageRef.current.style.display = ''; // Reset the display property when project changes
         }
     }, [project]);
-    
 
+    const cardStyle = {
+        marginTop: '16px',
+        background: 'rgba(255, 255, 255, .90)', // 50% transparent white background
+      };
+    
     return (
-        <div style={{ padding: '30px' }}>    
-            <Card style={{ marginTop: '16px' }}>            
+        <div style={{ padding: '20px' }}>    
+            <Card style={cardStyle}>         
                 <CardContent>            
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -27,7 +31,11 @@ const ProjectCard = ({ project }) => {
                                     src={`${process.env.REACT_APP_PUBLIC_URL}/logos/${project["Client"]}.png`} 
                                     alt="Logo" 
                                     onError={handleImageError}
-                                    style={{ maxWidth: '100%', height: '150px' }}
+                                    style={{
+                                        maxWidth: '100%',
+                                        height: '125px',
+                                        opacity: 0.90, // Set the opacity to 50%
+                                      }}
                                 />
                             </Box>
                             <Typography variant="h4" style={{ textAlign: 'center' }}>
@@ -35,8 +43,8 @@ const ProjectCard = ({ project }) => {
                             </Typography>
                             <Typography variant="h6" style={{ textAlign: 'center' }}>{project["Project"]}</Typography>
                             <hr/>
-                            <Typography variant="body1" style={{ textAlign: 'center' }}>Market: <strong>{project["Primary Market"]}</strong></Typography>                    
-                            <Typography variant="body1" style={{ textAlign: 'center' }}>BPO: <strong>{project["Primary Owner"]}</strong></Typography>                    
+                            <Typography variant="body1" style={{ textAlign: 'center' }}>Market: <strong>{project["Primary Market"]}</strong>&nbsp;&nbsp;BPO: <strong>{project["Primary Owner"]}</strong></Typography>                    
+                            
                         </Grid>              
                     </Grid>
                 </CardContent>

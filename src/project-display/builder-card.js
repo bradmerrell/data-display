@@ -19,7 +19,7 @@ const BuilderCard = ({ builders }) => {
   };
 
   return (
-    <div style={{ padding: '30px' }}>
+    <div style={{ padding: '20px' }}>
       <Card style={cardStyle}>
         <CardContent>
           <Typography variant="h5" component="div" style={{ textAlign: 'center' }}>

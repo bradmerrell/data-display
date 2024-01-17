@@ -6,7 +6,7 @@ const BuilderCard = ({ builders }) => {
   if (numColumns > 4) {
     numColumns = 4;
   }
-  console.log ("numColumns:", numColumns);
+  //console.log ("numColumns:", numColumns);
 
   const cardStyle = {
     marginTop: '16px',

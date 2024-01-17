@@ -52,7 +52,8 @@ const App = () => {
   const [primaryOpps, setPrimaryOpps] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [lastBC, setLastBC] = useState(null); // to track the last fetched BC
-  const [seq, setSeq] = useState(0); // Using state to manage 'seq'
+  const [seq, setSeq] = useState(0); // Using state to manage 'seq' the index for the project that is being rotated through.
+  const [rotation, setRotation] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog  
   const [builderCount, setBuilderCount]= useState(0);
   const [bcCount, setBcCount]= useState(0);
@@ -64,7 +65,8 @@ const App = () => {
     setIsDialogOpen(false);
   };
 
-  const timer_ms = 8000;
+  const timer_ms = 10000;
+  const maxRotations = 3;
 
   const query = useQuery();
   // Retrieve BC parameter only once during the component's mounting
@@ -89,14 +91,14 @@ const App = () => {
   };
 
   const getBackgroundImage = (data, primaryOpp) => {
-    var bgImage = 'Slalom.png';
+    var bgImage = 'blank.png';
     if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {      
       var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
       var market = projectRow["Primary Market"];
       if (market !== undefined) {        
         bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
         if (bgImage === undefined) {
-          bgImage = 'Slalom.png';
+          bgImage = 'blank.png';
         }
       }
     }
@@ -154,6 +156,7 @@ const App = () => {
   
   const refreshData = useCallback(async () => {
     setIsLoading(true);
+    
     try {      
       var url = `${process.env.REACT_APP_DATA_API_GET}`;
       if (bc != null && bc.length > 0) {
@@ -184,14 +187,20 @@ const App = () => {
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
     setSeq(prevSeq => {
-      if ((prevSeq + 1) > primaryOpps.length)
+      if ((prevSeq + 1) >= primaryOpps.length)
       {
-        return prevSeq;
+        console.log("Rotation:", rotation);
+        if (rotation + 1 > maxRotations)
+        {
+          window.location.reload();
+        } else {
+          setRotation(rotation + 1);
+        }
       }
       const nextSeq = (prevSeq + 1) % primaryOpps.length;
       return nextSeq === 0 ? 0 : nextSeq; // Resets to 1 when it exceeds the length
     });
-  }, [primaryOpps.length]);
+  }, [primaryOpps.length, rotation, maxRotations]);
 
   useEffect(() => {
     const timer = setInterval(updateSeq, timer_ms); // Update every 5 seconds
@@ -224,13 +233,6 @@ const App = () => {
     }
   }, [bc,data,lastBC, refreshData]);
 
-    // New useEffect for refreshing data when seq resets
-  useEffect(() => {    
-    if (seq > primaryOpps.length) {
-      refreshData();
-    }
-  }, [seq, primaryOpps, refreshData]);
-
   if (isLoading) {    
     return <div>Loading...</div>; // Or any other loading indicator
   } 
@@ -250,7 +252,7 @@ const App = () => {
           </div>
           <div style={{ textAlign: 'center' }}>
             <Typography variant="h6" style={{ textAlign: 'center' }}>
-              <strong>{primaryOpps.length} projects, {builderCount} builders, {bcCount} build centers</strong>
+              {primaryOpps.length} projects, {builderCount} builders, {bcCount} build centers
             </Typography>  
             { (bc.trim().length > 0) ? (
               <Typography variant="h8" style={{ textAlign: 'center' }}> {lastBC} </Typography>
@@ -274,7 +276,21 @@ const App = () => {
       {/* File Upload Dialog */}
       <FileUploadDialog open={isDialogOpen} onClose={handleCloseDialog} />
       {isLoading ? (
-          <div>Loading...</div>
+          <div style={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+              <img                          
+                  src={`${process.env.REACT_APP_PUBLIC_URL}/logos/slalom_build.png`} 
+                  alt="Slalom_build" 
+                  style={{
+                      maxWidth: '100%',
+                      height: '400px',                
+                    }}
+              />
+          </div>
         ) : data && data.length > 0 ? (
             <div>
               <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} primaryOps={ primaryOpps} buildCenters={lastBC} />              

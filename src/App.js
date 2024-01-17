@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import ProjectDisplay from './project-display/project-display';
 import FileUploadDialog from './upload/file-upload-display';
@@ -233,10 +233,6 @@ const App = () => {
     }
   }, [bc,data,lastBC, refreshData]);
 
-  if (isLoading) {    
-    return <div>Loading...</div>; // Or any other loading indicator
-  } 
-
   return (    
     <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),
                   backgroundRepeat: 'no-repeat',
@@ -280,16 +276,30 @@ const App = () => {
                   flexGrow: 1,
                   display: 'flex',
                   justifyContent: 'center',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  height: '100vh',
+                  width: '100vw'
                 }}>
-              <img                          
-                  src={`${process.env.REACT_APP_PUBLIC_URL}/logos/slalom_build.png`} 
-                  alt="Slalom_build" 
-                  style={{
-                      maxWidth: '100%',
-                      height: '400px',                
-                    }}
-              />
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Box textAlign="center">
+                    <img                          
+                        src={`${process.env.REACT_APP_PUBLIC_URL}/images/Mark-CyanOnBlack-FIll.svg`} 
+                        alt="Slalom_build" 
+                        style={{
+                            maxWidth: '100%',
+                            height: '300px',                
+                          }}
+                    />
+                  </Box>
+                  <Typography variant="h4" style={{ textAlign: 'center' }}>
+                          &nbsp;
+                  </Typography>
+                  <Typography variant="h2" style={{ textAlign: 'center' }}>
+                    Build Project Showcase
+                  </Typography>
+                </Grid>
+              </Grid>            
           </div>
         ) : data && data.length > 0 ? (
             <div>

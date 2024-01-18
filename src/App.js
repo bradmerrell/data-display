@@ -140,7 +140,7 @@ const App = () => {
     // Iterate through the array and add the field values to the set        
 
     data.forEach(item => {
-      if (item["Primary Opp"] !== 'NO PRIMARY') {
+      if (item["Primary Opp"].trim().length > 0 && item["Primary Opp"].toUpperCase() !== 'NO PRIMARY' && item["Primary Opp"].toUpperCase() !== 'LEAVE') {
           if (arrBC.length > 0) {
             if (arrBC.indexOf(item["BC"]) !== -1) {
               uniqueValues.add(item[fieldName]);  
@@ -163,7 +163,9 @@ const App = () => {
       const uniqueValues = new Set();
       // Iterate through the array and add the field values to the set
       data.forEach(item => {
-        uniqueValues.add(item["BC"]);
+        if (item["BC"].trim().length > 0) {
+          uniqueValues.add(item["BC"]);
+        }
       });
       // Calculate the distinct count
       return uniqueValues.size; 
@@ -213,19 +215,16 @@ const App = () => {
     
     try {      
       const data = await fetchDataFromAPI();      
-      console.log("data:", data);  
       setData(data);
       localStorage.setItem('staffing.showcase.data', JSON.stringify(data));
       setPrimaryOpps(getDistinctPrimaryOpps(data));
       localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(data)));
       setLastBC(bc); // Update lastBC after successful fetch  
       localStorage.setItem('staffing.showcase.lastBC', bc);    
-      console.log("bc:", bc);
       setBcCount(getBuildCenterCount(data, bc));    
       setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
       setMarketCount(getDistinctCountByBC(data, bc, "Primary Market"));  
       const lastModifiedDate = await fetchLastModifiedFromAPI();
-      console.log("lastModified:", lastModifiedDate);
       setLastModified(lastModifiedDate);
       localStorage.setItem('staffing.showcase.lastModified', lastModifiedDate);  
       setSeq(0);          
@@ -241,10 +240,10 @@ const App = () => {
     setSeq(prevSeq => {
       if ((prevSeq + 1) >= primaryOpps.length)
       {
-        console.log("Rotation:", rotation);
+        //console.log("Rotation:", rotation);
         if (rotation + 1 >= maxRotations)
         {
-          console.log("Data Refresh");
+          //console.log("Data Refresh");
           localStorage.clear();
           window.location.reload();
         } else {
@@ -274,7 +273,6 @@ const App = () => {
         setPrimaryOpps(JSON.parse(cachedPrimaryOpps))
         setLastBC(cachedLastBC); // Update lastBC after successful fetch    
         setLastModified(cachedLastModified);
-        console.log("bc:", bc);
         setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));   
         setBuilderCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Name"));      
         setMarketCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Primary Market"));      
@@ -301,7 +299,7 @@ const App = () => {
       <AppBar position="static">
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
-            <Typography variant="h6">Build Project Showcase</Typography>
+            <Typography variant="h6">Project Showcase</Typography>
           </div>
           <div style={{ textAlign: 'center' }}>
             { data && data.length > 0 ? (

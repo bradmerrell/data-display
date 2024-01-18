@@ -68,7 +68,7 @@ const App = () => {
   };
 
   const timer_ms = 10000;
-  const maxRotations = 3;
+  const maxRotations = 5;
 
   const query = useQuery();
   // Retrieve BC parameter only once during the component's mounting
@@ -156,36 +156,47 @@ const App = () => {
     }
   }
   
-  const refreshData = useCallback(async () => {
-    setIsLoading(true);
-    
-    try {      
-      var url = `${process.env.REACT_APP_DATA_API_GET}`;
-      if (bc != null && bc.length > 0) {
-        url = url + `&BC=${bc}`;
-      }
+  const fetchDataFromAPI = useCallback(async () => {
+    var url = `${process.env.REACT_APP_DATA_API_GET}`;
+    if (bc != null && bc.length > 0) {
+      url = url + `&BC=${bc}`;
+    }
+    try {
       const response = await axios.get(url, {
         headers: {
             'x-api-key': process.env.REACT_APP_DATA_API_KEY
         }
-      });          
-      setData(response.data);
-      localStorage.setItem('staffing.showcase.data', JSON.stringify(response.data));
-      setPrimaryOpps(getDistinctPrimaryOpps(response.data));
-      localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(response.data)));
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error; // Re-throw the error for handling in the caller
+    }
+  }, [bc]); // Add necessary dependencies
+
+  const refreshData = useCallback(async () => {
+    setIsLoading(true);
+    
+    try {      
+      const data = await fetchDataFromAPI();      
+      console.log("data:", data);  
+      setData(data);
+      localStorage.setItem('staffing.showcase.data', JSON.stringify(data));
+      setPrimaryOpps(getDistinctPrimaryOpps(data));
+      localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(data)));
       setLastBC(bc); // Update lastBC after successful fetch  
       localStorage.setItem('staffing.showcase.lastBC', bc);    
       console.log("bc:", bc);
-      setBcCount(getBuildCenterCount(response.data, bc));    
-      setBuilderCount(getDistinctCountByBC(response.data, bc, "Name"));      
-      setMarketCount(getDistinctCountByBC(response.data, bc, "Primary Market"));  
+      setBcCount(getBuildCenterCount(data, bc));    
+      setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
+      setMarketCount(getDistinctCountByBC(data, bc, "Primary Market"));  
       setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [bc]); // Add necessary dependencies
+  }, [bc, fetchDataFromAPI]); // Add necessary dependencies
 
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
@@ -193,8 +204,10 @@ const App = () => {
       if ((prevSeq + 1) >= primaryOpps.length)
       {
         console.log("Rotation:", rotation);
-        if (rotation + 1 > maxRotations)
+        if (rotation + 1 >= maxRotations)
         {
+          console.log("Data Refresh");
+          localStorage.clear();
           window.location.reload();
         } else {
           setRotation(rotation + 1);
@@ -253,7 +266,7 @@ const App = () => {
           <div style={{ textAlign: 'center' }}>
             { data && data.length > 0 ? (
             <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {primaryOpps.length} projects, {builderCount} builders, {marketCount} markets, {bcCount} build centers
+              {primaryOpps.length} projects {builderCount} builders {marketCount} markets {bcCount} build centers
             </Typography>  
               ) : ( "" ) 
             }

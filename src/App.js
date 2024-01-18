@@ -58,6 +58,7 @@ const App = () => {
   const [builderCount, setBuilderCount]= useState(0);
   const [bcCount, setBcCount]= useState(0);
   const [marketCount, setMarketCount] = useState(0);
+  const [lastModified, setLastModified] = useState(0);
 
   const handleMenuClick = () => {
     setIsDialogOpen(true);
@@ -114,6 +115,19 @@ const App = () => {
       .map(row => `${row["Name"]} (${row["Capability"]}) - [${row["Physical Location"]}]`);
     return builders;
   };
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1); // Months are zero indexed
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    // Pad the month and day with leading zeros if necessary
+    const formattedMonth = month.length < 2 ? '0' + month : month;
+    const formattedDay = day.length < 2 ? '0' + day : day;
+
+    return `${formattedMonth}/${formattedDay}/${year}`;
+  }
 
   const getDistinctCountByBC = (data, bc, fieldName) => {    
     var arrBC = [];
@@ -174,6 +188,26 @@ const App = () => {
     }
   }, [bc]); // Add necessary dependencies
 
+  const fetchLastModifiedFromAPI = useCallback(async () => {
+    var url = `${process.env.REACT_APP_DATA_API_UPLOAD}`;
+    url = url.replace("upload","lastmodified");
+    try {
+      const response = await axios.get(url, {
+        headers: {
+            'x-api-key': process.env.REACT_APP_DATA_API_KEY
+        }
+      });
+      if (response && response.data && response.data.lastModified) {
+        return formatDate(response.data.lastModified);
+      } else {
+        return "";
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error; // Re-throw the error for handling in the caller
+    }
+  }, []); // Add necessary dependencies
+
   const refreshData = useCallback(async () => {
     setIsLoading(true);
     
@@ -190,13 +224,17 @@ const App = () => {
       setBcCount(getBuildCenterCount(data, bc));    
       setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
       setMarketCount(getDistinctCountByBC(data, bc, "Primary Market"));  
+      const lastModifiedDate = await fetchLastModifiedFromAPI();
+      console.log("lastModified:", lastModifiedDate);
+      setLastModified(lastModifiedDate);
+      localStorage.setItem('staffing.showcase.lastModified', lastModifiedDate);  
       setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [bc, fetchDataFromAPI]); // Add necessary dependencies
+  }, [bc, fetchDataFromAPI, fetchLastModifiedFromAPI]); // Add necessary dependencies
 
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
@@ -230,14 +268,16 @@ const App = () => {
       const cachedData = localStorage.getItem('staffing.showcase.data');
       const cachedPrimaryOpps = localStorage.getItem('staffing.showcase.primaryOpps');
       const cachedLastBC = localStorage.getItem('staffing.showcase.lastBC');
+      const cachedLastModified = localStorage.getItem('staffing.showcase.lastModified');
       if (bc === cachedLastBC && cachedData && cachedData.length > 0) {
         setData(JSON.parse(cachedData));
         setPrimaryOpps(JSON.parse(cachedPrimaryOpps))
         setLastBC(cachedLastBC); // Update lastBC after successful fetch    
+        setLastModified(cachedLastModified);
         console.log("bc:", bc);
         setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));   
         setBuilderCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Name"));      
-        setMarketCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Primary Market"));        
+        setMarketCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Primary Market"));      
         setIsLoading(false);
       } else {
         refreshData();
@@ -286,16 +326,24 @@ const App = () => {
             }
           </div>
           <div>
-            <Button color="inherit" onClick={handleMenuClick}>
-              <img                          
-                  src={`${process.env.REACT_APP_PUBLIC_URL}/images/upload.png`} 
-                  alt="Upload" 
-                  style={{
-                      maxWidth: '100%',
-                      height: '25px',                
-                    }}
-              />
-            </Button>            
+            { (data && data.length > 0) ? (
+              <Button color="inherit" onClick={handleMenuClick} title="Upload Latest Spreadsheet">
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box textAlign="center">
+                      <Typography variant="h12" style={{ textAlign: 'center' }}>
+                        Last Updated
+                      </Typography> 
+                      <br/>
+                      <Typography variant="h12" style={{ textAlign: 'center' }}>
+                        { lastModified }
+                      </Typography> 
+                    </Box>
+                  </Grid>
+                </Grid>             
+              </Button>           
+             ) : ("")  
+            }
           </div>
         </Toolbar>
       </AppBar>

@@ -266,15 +266,24 @@ const App = () => {
           <div style={{ textAlign: 'center' }}>
             { data && data.length > 0 ? (
             <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {primaryOpps.length} projects {builderCount} builders {marketCount} markets {bcCount} build centers
+              {primaryOpps.length} projects {builderCount} builders {marketCount} markets
             </Typography>  
               ) : ( "" ) 
             }
-            { (data && data.length > 0 && bc.trim().length > 0) ? (
-              <Typography variant="h8" style={{ textAlign: 'center' }}> {lastBC} </Typography>
+            { (data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length === 1) ? (
+                <Typography variant="h6" style={{ textAlign: 'center' }}> 
+                    {bcCount} build center - { lastBC } 
+                </Typography>
+              ) : data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length > 1 ? (
+                <Typography variant="h6" style={{ textAlign: 'center' }}> 
+                  {bcCount} build centers - { lastBC } 
+                </Typography>
+              ) : data && data.length > 0 && bc.trim().length === 0 ? (
+              <Typography variant="h6" style={{ textAlign: 'center' }}> 
+                {bcCount} build centers
+              </Typography>
               ) : ( "" )
-            }    
-       
+            }
           </div>
           <div>
             <Button color="inherit" onClick={handleMenuClick}>

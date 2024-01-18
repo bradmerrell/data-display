@@ -57,6 +57,8 @@ const App = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog  
   const [builderCount, setBuilderCount]= useState(0);
   const [bcCount, setBcCount]= useState(0);
+  const [marketCount, setMarketCount] = useState(0);
+
   const handleMenuClick = () => {
     setIsDialogOpen(true);
   };
@@ -113,7 +115,7 @@ const App = () => {
     return builders;
   };
 
-  const getBuilderCount = (data, bc) => {    
+  const getDistinctCountByBC = (data, bc, fieldName) => {    
     var arrBC = [];
     if (bc != null && bc.trim() !== "") {
       arrBC = bc.split(',');            
@@ -127,10 +129,10 @@ const App = () => {
       if (item["Primary Opp"] !== 'NO PRIMARY') {
           if (arrBC.length > 0) {
             if (arrBC.indexOf(item["BC"]) !== -1) {
-              uniqueValues.add(item["Name"]);  
+              uniqueValues.add(item[fieldName]);  
             }              
           } else {
-            uniqueValues.add(item["Name"]);
+            uniqueValues.add(item[fieldName]);
           }
       }
     });
@@ -175,7 +177,8 @@ const App = () => {
       localStorage.setItem('staffing.showcase.lastBC', bc);    
       console.log("bc:", bc);
       setBcCount(getBuildCenterCount(response.data, bc));    
-      setBuilderCount(getBuilderCount(response.data, bc));      
+      setBuilderCount(getDistinctCountByBC(response.data, bc, "Name"));      
+      setMarketCount(getDistinctCountByBC(response.data, bc, "Primary Market"));  
       setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -219,8 +222,9 @@ const App = () => {
         setPrimaryOpps(JSON.parse(cachedPrimaryOpps))
         setLastBC(cachedLastBC); // Update lastBC after successful fetch    
         console.log("bc:", bc);
-        setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));
-        setBuilderCount(getBuilderCount(JSON.parse(cachedData), bc));         
+        setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));   
+        setBuilderCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Name"));      
+        setMarketCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Primary Market"));        
         setIsLoading(false);
       } else {
         refreshData();
@@ -247,13 +251,17 @@ const App = () => {
             <Typography variant="h6">Build Project Showcase</Typography>
           </div>
           <div style={{ textAlign: 'center' }}>
+            { data && data.length > 0 ? (
             <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {primaryOpps.length} projects, {builderCount} builders, {bcCount} build centers
+              {primaryOpps.length} projects, {builderCount} builders, {marketCount} markets, {bcCount} build centers
             </Typography>  
-            { (bc.trim().length > 0) ? (
+              ) : ( "" ) 
+            }
+            { (data && data.length > 0 && bc.trim().length > 0) ? (
               <Typography variant="h8" style={{ textAlign: 'center' }}> {lastBC} </Typography>
               ) : ( "" )
-            }            
+            }    
+       
           </div>
           <div>
             <Button color="inherit" onClick={handleMenuClick}>

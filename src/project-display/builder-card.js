@@ -10,7 +10,7 @@ const BuilderCard = ({ builders }) => {
 
   const cardStyle = {
     marginTop: '16px',
-    background: 'rgba(255, 255, 255, 0.66)', // 50% transparent white background
+    background: 'rgba(255, 255, 255, 0.80)', // 50% transparent white background
   };
 
   const listContainerStyle = {

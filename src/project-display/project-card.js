@@ -34,7 +34,7 @@ const ProjectCard = ({ project }) => {
                                     style={{
                                         maxWidth: '100%',
                                         height: '125px',
-                                        opacity: 0.90, // Set the opacity to 50%
+                                        opacity: 0.85, // Set the opacity to 50%
                                       }}
                                 />
                             </Box>

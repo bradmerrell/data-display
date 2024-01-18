@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { AppBar, Toolbar, Typography, Button, Box, Grid } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Grid, Tooltip } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import ProjectDisplay from './project-display/project-display';
 import FileUploadDialog from './upload/file-upload-display';
@@ -327,7 +327,8 @@ const App = () => {
           </div>
           <div>
             { (data && data.length > 0) ? (
-              <Button color="inherit" onClick={handleMenuClick} title="Upload Latest Spreadsheet">
+              <Tooltip title="Click to upload the latest spreadsheet">
+              <Button color="inherit" onClick={handleMenuClick}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Box textAlign="center">
@@ -341,7 +342,8 @@ const App = () => {
                     </Box>
                   </Grid>
                 </Grid>             
-              </Button>           
+              </Button>          
+              </Tooltip> 
              ) : ("")  
             }
           </div>

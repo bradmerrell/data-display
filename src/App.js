@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { AppBar, Toolbar, Typography, Button, Box, Grid, Tooltip } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import ProjectDisplay from './project-display/project-display';
 import FileUploadDialog from './upload/file-upload-display';
+import ShowcaseAppBar from './page/showcase-appbar';
+import LoadingSplash from './page/loading-splash';
 
 // Custom hook to parse query parameters
 const useQuery = () => {
@@ -54,22 +55,22 @@ const App = () => {
   const [lastBC, setLastBC] = useState(null); // to track the last fetched BC
   const [seq, setSeq] = useState(0); // Using state to manage 'seq' the index for the project that is being rotated through.
   const [rotation, setRotation] = useState(0);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog  
   const [builderCount, setBuilderCount]= useState(0);
   const [bcCount, setBcCount]= useState(0);
   const [marketCount, setMarketCount] = useState(0);
   const [lastModified, setLastModified] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleMenuClick = () => {
-    setIsDialogOpen(true);
-  };
+  const timer_ms = 10000;
+  const maxRotations = 5;
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
 
-  const timer_ms = 10000;
-  const maxRotations = 5;
+  const handleMenuClick = () => {
+    setIsDialogOpen(true);
+  };
 
   const query = useQuery();
   // Retrieve BC parameter only once during the component's mounting
@@ -296,95 +297,16 @@ const App = () => {
                   height: '100vh', // Adjust the height as needed
                   width: '100vw' // Adjust the width as needed
               }}> 
-      <AppBar position="static">
-        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <Typography variant="h6">Project Showcase</Typography>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            { data && data.length > 0 ? (
-            <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {primaryOpps.length} projects {builderCount} builders {marketCount} markets
-            </Typography>  
-              ) : ( "" ) 
-            }
-            { (data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length === 1) ? (
-                <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                    {bcCount} build center - { lastBC } 
-                </Typography>
-              ) : data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length > 1 ? (
-                <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                  {bcCount} build centers - { lastBC } 
-                </Typography>
-              ) : data && data.length > 0 && bc.trim().length === 0 ? (
-              <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                {bcCount} build centers
-              </Typography>
-              ) : ( "" )
-            }
-          </div>
-          <div>
-            { (data && data.length > 0) ? (
-              <Tooltip title="Click to upload the latest spreadsheet">
-              <Button color="inherit" onClick={handleMenuClick}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Box textAlign="center">
-                      <Typography variant="h12" style={{ textAlign: 'center' }}>
-                        Last Updated
-                      </Typography> 
-                      <br/>
-                      <Typography variant="h12" style={{ textAlign: 'center' }}>
-                        { lastModified }
-                      </Typography> 
-                    </Box>
-                  </Grid>
-                </Grid>             
-              </Button>          
-              </Tooltip> 
-             ) : ("")  
-            }
-          </div>
-        </Toolbar>
-      </AppBar>
-      {/* File Upload Dialog */}
+      <ShowcaseAppBar data={data} primaryOpps={primaryOpps} bcCount={bcCount} 
+              builderCount={builderCount} marketCount={marketCount} lastModified={lastModified} 
+              bc={bc} lastBC={lastBC} handleMenuClick={handleMenuClick}/>
       <FileUploadDialog open={isDialogOpen} onClose={handleCloseDialog} />
       {isLoading ? (
-          <div style={{
-                  flexGrow: 1,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100vh',
-                  width: '100vw'
-                }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Box textAlign="center">
-                    <img                          
-                        src={`${process.env.REACT_APP_PUBLIC_URL}/images/Mark-CyanOnBlack-FIll.svg`} 
-                        alt="Slalom_build" 
-                        style={{
-                            maxWidth: '100%',
-                            height: '300px',                
-                          }}
-                    />
-                  </Box>
-                  <Typography variant="h4" style={{ textAlign: 'center' }}>
-                          &nbsp;
-                  </Typography>
-                  <Typography variant="h2" style={{ textAlign: 'center' }}>
-                    Build Project Showcase
-                  </Typography>
-                </Grid>
-              </Grid>            
-          </div>
+          <LoadingSplash />
         ) : data && data.length > 0 ? (
-            <div>
-              <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} primaryOps={ primaryOpps} buildCenters={lastBC} />              
-            </div>
+          <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} primaryOps={ primaryOpps} buildCenters={lastBC} />              
         ) : (
-            <div>No data available.</div>
+          <LoadingSplash message="No Data Available"/>
         )
       }
     </div>

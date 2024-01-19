@@ -96,8 +96,8 @@ const App = () => {
 
   const getBackgroundImage = (data, primaryOpp) => {
     var bgImage = 'blank.png';
-    if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {      
-      var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
+    if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {        
+      var projectRow = getFirstRowByPrimaryOpp(data, primaryOpp);
       var market = projectRow["Primary Market"];
       if (market !== undefined) {        
         bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
@@ -290,7 +290,7 @@ const App = () => {
   }, [bc,data,lastBC, refreshData]);
 
   return (    
-    <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),
+    <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),                  
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover', // or 'contain' depending on your needs
                   backgroundPosition: 'center',

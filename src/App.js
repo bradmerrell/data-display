@@ -216,18 +216,14 @@ const App = () => {
     
     try {      
       const data = await fetchDataFromAPI();      
-      setData(data);
-      localStorage.setItem('staffing.showcase.data', JSON.stringify(data));
-      setPrimaryOpps(getDistinctPrimaryOpps(data));
-      localStorage.setItem('staffing.showcase.primaryOpps', JSON.stringify(getDistinctPrimaryOpps(data)));
+      const lastModifiedDate = await fetchLastModifiedFromAPI();
+      setData(data);      
+      setPrimaryOpps(getDistinctPrimaryOpps(data));      
       setLastBC(bc); // Update lastBC after successful fetch  
-      localStorage.setItem('staffing.showcase.lastBC', bc);    
       setBcCount(getBuildCenterCount(data, bc));    
       setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
       setMarketCount(getDistinctCountByBC(data, bc, "Primary Market"));  
-      const lastModifiedDate = await fetchLastModifiedFromAPI();
       setLastModified(lastModifiedDate);
-      localStorage.setItem('staffing.showcase.lastModified', lastModifiedDate);  
       setSeq(0);          
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -265,22 +261,7 @@ const App = () => {
     // Function to fetch data
     const fetchData = async () => {
       setIsLoading(true);
-      const cachedData = localStorage.getItem('staffing.showcase.data');
-      const cachedPrimaryOpps = localStorage.getItem('staffing.showcase.primaryOpps');
-      const cachedLastBC = localStorage.getItem('staffing.showcase.lastBC');
-      const cachedLastModified = localStorage.getItem('staffing.showcase.lastModified');
-      if (bc === cachedLastBC && cachedData && cachedData.length > 0) {
-        setData(JSON.parse(cachedData));
-        setPrimaryOpps(JSON.parse(cachedPrimaryOpps))
-        setLastBC(cachedLastBC); // Update lastBC after successful fetch    
-        setLastModified(cachedLastModified);
-        setBcCount(getBuildCenterCount(JSON.parse(cachedData), bc));   
-        setBuilderCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Name"));      
-        setMarketCount(getDistinctCountByBC(JSON.parse(cachedData), bc, "Primary Market"));      
-        setIsLoading(false);
-      } else {
-        refreshData();
-      }
+      refreshData();
     };
 
     // Fetch data only if it's not already loaded or BC query param changes

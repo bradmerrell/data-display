@@ -81,7 +81,7 @@ const App = () => {
     const primaryOppSet = new Set(
       data
         .map(item => item["Primary Opp"])
-        .filter(opp => Boolean(opp) && opp !== "NO PRIMARY")
+        .filter(opp => Boolean(opp) && opp.trim().length > 0 && opp.toUpperCase() !== "NO PRIMARY" && opp.toUpperCase() !== "LEAVE" && opp.toUpperCase() !== "PTO")
     );
     const uniquePrimaryOpps = Array.from(primaryOppSet);
     uniquePrimaryOpps.sort(); // Sort the array alphabetically
@@ -95,14 +95,14 @@ const App = () => {
   };
 
   const getBackgroundImage = (data, primaryOpp) => {
-    var bgImage = 'blank.png';
+    var bgImage = 'white.png';
     if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {        
       var projectRow = getFirstRowByPrimaryOpp(data, primaryOpp);
       var market = projectRow["Primary Market"];
       if (market !== undefined) {        
         bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
         if (bgImage === undefined) {
-          bgImage = 'blank.png';
+          bgImage = 'black.png';
         }
       }
     }

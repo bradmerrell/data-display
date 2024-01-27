@@ -8,9 +8,14 @@ const ProjectDisplay = ({ projectRow, builderList }) => {
   // console.log("builders:", builderList);
   return (
     <Grid container spacing={2}>
-        <Grid item xs={12}>
-            <ProjectCard project={projectRow} />     
-            <BuilderCard builders={builderList} />   
+        {/* ProjectCard on the left */}
+        <Grid item xs={12} md={6}>
+            <ProjectCard project={projectRow} />
+        </Grid>
+
+        {/* BuilderCard on the right */}
+        <Grid item xs={12} md={6}>
+            <BuilderCard builders={builderList} />
         </Grid>
     </Grid>
   );

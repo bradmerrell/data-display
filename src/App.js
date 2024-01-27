@@ -81,7 +81,11 @@ const App = () => {
     const clientProjectSet = new Set(
       data
         .map(item => item["ClientProject"])
-        .filter(opp => Boolean(opp) && opp.trim().length > 0 && opp.toUpperCase() !== "NO PRIMARY" && opp.toUpperCase() !== "LEAVE" && opp.toUpperCase() !== "PTO" && opp.toUpperCase() !== "Bench")
+        .filter(opp => Boolean(opp) && opp.trim().length > 0 && 
+                       opp.toUpperCase() !== "NO PRIMARY" && 
+                       opp.toUpperCase() !== "LEAVE" && 
+                       opp.toUpperCase() !== "PTO" && 
+                       opp.toUpperCase() !== "BENCH")
     );
     const uniqueClientProjects = Array.from(clientProjectSet);
     uniqueClientProjects.sort(); // Sort the array alphabetically

@@ -43,7 +43,7 @@ const ProjectCard = ({ project }) => {
                             </Typography>
                             <Typography variant="h6" style={{ textAlign: 'center' }}>{project["Project"]}</Typography>
                             <hr/>
-                            <Typography variant="body1" style={{ textAlign: 'center' }}>Market: <strong>{project["Primary Market"]}</strong>&nbsp;&nbsp;BPO: <strong>{project["Primary Owner"]}</strong></Typography>                    
+                            <Typography variant="body1" style={{ textAlign: 'center' }}>Market: <strong>{project["Current Market"]}</strong>&nbsp;&nbsp;BPO: <strong>{project["Current Owner"]}</strong></Typography>                    
                             
                         </Grid>              
                     </Grid>

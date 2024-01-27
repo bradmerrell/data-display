@@ -50,7 +50,7 @@ const backgroundImageList = ["Atlanta.png",
 
 const App = () => {
   const [data, setData] = useState([]);
-  const [primaryOpps, setPrimaryOpps] = useState([]);
+  const [clientProjects, setClientProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
   const [lastBC, setLastBC] = useState(null); // to track the last fetched BC
   const [seq, setSeq] = useState(0); // Using state to manage 'seq' the index for the project that is being rotated through.
@@ -76,29 +76,29 @@ const App = () => {
   // Retrieve BC parameter only once during the component's mounting
   const bc = query.get("BC") || ""; // Fallback value if BC is not provided
 
-  // Function to extract unique Primary Opp values
-  const getDistinctPrimaryOpps = (data) => {
-    const primaryOppSet = new Set(
+  // Function to extract unique Client Projects values
+  const getDistinctClientProjects = (data) => {
+    const clientProjectSet = new Set(
       data
-        .map(item => item["Primary Opp"])
-        .filter(opp => Boolean(opp) && opp.trim().length > 0 && opp.toUpperCase() !== "NO PRIMARY" && opp.toUpperCase() !== "LEAVE" && opp.toUpperCase() !== "PTO")
+        .map(item => item["ClientProject"])
+        .filter(opp => Boolean(opp) && opp.trim().length > 0 && opp.toUpperCase() !== "NO PRIMARY" && opp.toUpperCase() !== "LEAVE" && opp.toUpperCase() !== "PTO" && opp.toUpperCase() !== "Bench")
     );
-    const uniquePrimaryOpps = Array.from(primaryOppSet);
-    uniquePrimaryOpps.sort(); // Sort the array alphabetically
-    return uniquePrimaryOpps;
+    const uniqueClientProjects = Array.from(clientProjectSet);
+    uniqueClientProjects.sort(); // Sort the array alphabetically
+    return uniqueClientProjects;
   };
   
 
-  const getFirstRowByPrimaryOpp = (data, primaryOpp) => {
-    var projectRow = data.find(row => row["Primary Opp"] === primaryOpp);     
+  const getFirstRowByClientProject = (data, clientProject) => {
+    var projectRow = data.find(row => row["ClientProject"] === clientProject);     
     return projectRow;
   };
 
-  const getBackgroundImage = (data, primaryOpp) => {
+  const getBackgroundImage = (data, clientProject) => {
     var bgImage = 'white.png';
-    if (data !== undefined && data.length > 0 && primaryOpp !== undefined) {        
-      var projectRow = getFirstRowByPrimaryOpp(data, primaryOpp);
-      var market = projectRow["Primary Market"];
+    if (data !== undefined && data.length > 0 && clientProject !== undefined) {        
+      var projectRow = getFirstRowByClientProject(data, clientProject);
+      var market = projectRow["Current Market"];
       if (market !== undefined) {        
         bgImage = backgroundImageList.find(bg=> bg === `${market}.png`)
         if (bgImage === undefined) {
@@ -109,9 +109,9 @@ const App = () => {
     return `url(${process.env.PUBLIC_URL}/backgrounds/${bgImage})`
   };
 
-  const getListOfBuilders = (data, primaryOpp) => {
+  const getListOfBuilders = (data, clientProject) => {
     var builders = data
-      .filter(row => row["Primary Opp"] === primaryOpp)
+      .filter(row => row["ClientProject"] === clientProject)
       .sort((a, b) => a["Name"].localeCompare(b["Name"])) // Adding sort here
       .map(row => `${row["Name"]} (${row["Capability"]}) - [${row["Physical Location"]}]`);
     return builders;
@@ -141,7 +141,11 @@ const App = () => {
     // Iterate through the array and add the field values to the set        
 
     data.forEach(item => {
-      if (item["Primary Opp"].trim().length > 0 && item["Primary Opp"].toUpperCase() !== 'NO PRIMARY' && item["Primary Opp"].toUpperCase() !== 'LEAVE') {
+      if (item["ClientProject"].trim().length > 0 && 
+          item["ClientProject"].toUpperCase() !== 'NO PRIMARY' && 
+          item["ClientProject"].toUpperCase() !== 'LEAVE' &&
+          item["ClientProject"].toUpperCase() !== 'BENCH'
+          ) {
           if (arrBC.length > 0) {
             if (arrBC.indexOf(item["BC"]) !== -1) {
               uniqueValues.add(item[fieldName]);  
@@ -218,11 +222,11 @@ const App = () => {
       const data = await fetchDataFromAPI();      
       const lastModifiedDate = await fetchLastModifiedFromAPI();
       setData(data);      
-      setPrimaryOpps(getDistinctPrimaryOpps(data));      
+      setClientProjects(getDistinctClientProjects(data));      
       setLastBC(bc); // Update lastBC after successful fetch  
       setBcCount(getBuildCenterCount(data, bc));    
       setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
-      setMarketCount(getDistinctCountByBC(data, bc, "Primary Market"));  
+      setMarketCount(getDistinctCountByBC(data, bc, "Current Market"));  
       setLastModified(lastModifiedDate);
       setSeq(0);          
     } catch (error) {
@@ -235,7 +239,7 @@ const App = () => {
   // Function to handle the increment of seq and reset logic
   const updateSeq = useCallback(() => {
     setSeq(prevSeq => {
-      if ((prevSeq + 1) >= primaryOpps.length)
+      if ((prevSeq + 1) >= clientProjects.length)
       {
         //console.log("Rotation:", rotation);
         if (rotation + 1 >= maxRotations)
@@ -247,10 +251,10 @@ const App = () => {
           setRotation(rotation + 1);
         }
       }
-      const nextSeq = (prevSeq + 1) % primaryOpps.length;
+      const nextSeq = (prevSeq + 1) % clientProjects.length;
       return nextSeq === 0 ? 0 : nextSeq; // Resets to 1 when it exceeds the length
     });
-  }, [primaryOpps.length, rotation, maxRotations]);
+  }, [clientProjects.length, rotation, maxRotations]);
 
   useEffect(() => {
     const timer = setInterval(updateSeq, timer_ms); // Update every 5 seconds
@@ -271,21 +275,21 @@ const App = () => {
   }, [bc,data,lastBC, refreshData]);
 
   return (    
-    <div style={{ backgroundImage: getBackgroundImage(data, primaryOpps[seq]),                  
+    <div style={{ backgroundImage: getBackgroundImage(data, clientProjects[seq]),                  
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover', // or 'contain' depending on your needs
                   backgroundPosition: 'center',
                   height: '100vh', // Adjust the height as needed
                   width: '100vw' // Adjust the width as needed
               }}> 
-      <ShowcaseAppBar data={data} primaryOpps={primaryOpps} bcCount={bcCount} 
+      <ShowcaseAppBar data={data} clientProjects={clientProjects} bcCount={bcCount} 
               builderCount={builderCount} marketCount={marketCount} lastModified={lastModified} 
               bc={bc} lastBC={lastBC} handleMenuClick={handleMenuClick}/>
       <FileUploadDialog open={isDialogOpen} onClose={handleCloseDialog} />
       {isLoading ? (
           <LoadingSplash />
         ) : data && data.length > 0 ? (
-          <ProjectDisplay projectRow={getFirstRowByPrimaryOpp(data, primaryOpps[seq])} builderList={getListOfBuilders(data, primaryOpps[seq])} primaryOps={ primaryOpps} buildCenters={lastBC} />              
+          <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq])} clientProjects={ clientProjects} buildCenters={lastBC} />              
         ) : (
           <LoadingSplash message="No Data Available"/>
         )

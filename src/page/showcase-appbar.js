@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Grid, Tooltip } from '@mui/material';
 
-const ShowcaseAppBar = ({ data, primaryOpps, bcCount, builderCount, marketCount, lastModified, bc, lastBC, handleMenuClick }) => {
+const ShowcaseAppBar = ({ data, clientProjects, bcCount, builderCount, marketCount, lastModified, bc, lastBC, handleMenuClick }) => {
 
   return (
       <AppBar position="static">
@@ -12,7 +12,7 @@ const ShowcaseAppBar = ({ data, primaryOpps, bcCount, builderCount, marketCount,
           <div style={{ textAlign: 'center' }}>
             { data && data.length > 0 ? (
             <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {primaryOpps.length} projects {builderCount} builders {marketCount} markets
+              {clientProjects.length} projects {builderCount} builders {marketCount} markets
             </Typography>  
               ) : ( "" ) 
             }
@@ -50,7 +50,26 @@ const ShowcaseAppBar = ({ data, primaryOpps, bcCount, builderCount, marketCount,
                 </Grid>             
               </Button>          
               </Tooltip> 
-             ) : ("")  
+             ) : (
+              <Tooltip title="Click to upload the latest spreadsheet">
+              <Button color="inherit" onClick={handleMenuClick}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box textAlign="center">
+                      <img                          
+                          src={`${process.env.REACT_APP_PUBLIC_URL}/images/upload.png`} 
+                          alt="Upload" 
+                          style={{
+                              maxWidth: '100%',
+                              height: '30px',                
+                              }}
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>             
+              </Button>          
+              </Tooltip> 
+             )  
             }
           </div>
         </Toolbar>

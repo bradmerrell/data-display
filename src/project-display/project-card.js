@@ -20,7 +20,7 @@ const ProjectCard = ({ project }) => {
       };
     
     return (
-        <div style={{ padding: '20px' }}>    
+        <div style={{ paddingTop: '5px', paddingBottom: '15px', paddingLeft: '20px', paddingRight: '5px' }}> 
             <Card style={cardStyle}>         
                 <CardContent>            
                     <Grid container spacing={2}>

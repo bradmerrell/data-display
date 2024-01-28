@@ -13,7 +13,7 @@ const BuilderCard = ({ builders }) => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ paddingTop: '5px', paddingBottom: '15px', paddingLeft: '5px', paddingRight: '20px' }}> 
       <Card style={cardStyle}>
         <CardContent>
           <Typography variant="h5" component="div" style={{ textAlign: 'center' }}>

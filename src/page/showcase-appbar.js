@@ -1,36 +1,30 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Grid, Tooltip } from '@mui/material';
 
-const ShowcaseAppBar = ({ data, clientProjects, bcCount, builderCount, marketCount, lastModified, bc, lastBC, handleMenuClick }) => {
+const ShowcaseAppBar = ({ data, lastModified, handleMenuClick }) => {
+
+  const textStyle = {
+    color: 'rgba(0, 0, 0, 0.9)', // 50% transparent white background
+    textAlign: 'center'
+  };
 
   return (
-      <AppBar position="static">
-        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <AppBar position="static" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', marginBottom: '8px' }}>
           <div>
-            <Typography variant="h6">Build Project Showcase</Typography>
+            <Typography variant="h6"> </Typography>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            { data && data.length > 0 ? (
-            <Typography variant="h6" style={{ textAlign: 'center' }}>
-              {clientProjects.length} projects {builderCount} builders {marketCount} markets
-            </Typography>  
-              ) : ( "" ) 
-            }
-            { (data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length === 1) ? (
-                <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                    {bcCount} build center - { lastBC } 
-                </Typography>
-              ) : data && data.length > 0 && bc.trim().length > 0 && bc.trim().split(",").length > 1 ? (
-                <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                  {bcCount} build centers - { lastBC } 
-                </Typography>
-              ) : data && data.length > 0 && bc.trim().length === 0 ? (
-              <Typography variant="h6" style={{ textAlign: 'center' }}> 
-                {bcCount} build centers
-              </Typography>
-              ) : ( "" )
-            }
-          </div>
+          <Box textAlign="center">
+            <img                          
+                src={`${process.env.REACT_APP_PUBLIC_URL}/images/Logo-Black-Cyan.png`} 
+                alt="Slalom_build" 
+                style={{
+                    maxWidth: '100%',
+                    height: '30px',                
+                    }}
+            />
+            <Typography variant="h6" style={textStyle}><strong>Build Project Showcase</strong></Typography>
+          </Box>
           <div>
             { (data && data.length > 0) ? (
               <Tooltip title="Click to upload the latest spreadsheet">
@@ -38,11 +32,11 @@ const ShowcaseAppBar = ({ data, clientProjects, bcCount, builderCount, marketCou
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Box textAlign="center">
-                      <Typography variant="h12" style={{ textAlign: 'center' }}>
+                      <Typography variant="h12" style={textStyle}>
                         Last Updated
                       </Typography> 
                       <br/>
-                      <Typography variant="h12" style={{ textAlign: 'center' }}>
+                      <Typography variant="h12" style={textStyle}>
                         { lastModified }
                       </Typography> 
                     </Box>

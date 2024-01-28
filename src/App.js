@@ -293,7 +293,7 @@ const App = () => {
       {isLoading ? (
           <LoadingSplash />
         ) : data && data.length > 0 ? (
-          <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq])} clientProjects={ clientProjects} buildCenters={lastBC} />              
+          <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq])} buildCenters={lastBC} data={data}/>              
         ) : (
           <LoadingSplash message="No Data Available"/>
         )

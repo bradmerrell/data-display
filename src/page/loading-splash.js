@@ -27,9 +27,6 @@ const LoadingSplash = ({ message }) => {
             <Typography variant="h4" style={{ textAlign: 'center' }}>
                     &nbsp;
             </Typography>
-            <Typography variant="h2" style={{ textAlign: 'center' }}>
-              Project Showcase
-            </Typography>
             <Typography variant="h6" style={{ textAlign: 'center' }}>
               { message }
             </Typography>

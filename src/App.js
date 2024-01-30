@@ -133,11 +133,37 @@ const App = () => {
     return `url(${process.env.PUBLIC_URL}/backgrounds/${bgImage})`
   };
 
-  const getListOfBuilders = (data, clientProject) => {
-    var builders = data
-      .filter(row => row["ClientProject"] === clientProject)
-      .sort((a, b) => a["Name"].localeCompare(b["Name"])) // Adding sort here
-      .map(row => `${row["Name"]} (${row["Capability"]}) - [${row["Physical Location"]}]`);
+  const getListOfBuilders = (data, clientProject, bc) => {
+    var arrBuildCenters = [];
+    // Create a set to store unique values of the specified field
+    const builderSet = new Set();
+    if (bc && bc.trim() !== "") {
+      arrBuildCenters = bc.split(',');    
+    }
+    if (!data) {
+      return [];
+    }
+
+    console.log("bc:",bc);
+    console.log("arrBuildCenters:", arrBuildCenters);
+
+    // Iterate through the array and add the field values to the set
+    data.forEach(project => {
+      if (project["ClientProject"] === clientProject) {
+        if (arrBuildCenters.length > 0) {
+          arrBuildCenters.forEach(builderCenter => {
+            if (builderCenter.indexOf(project["BC"]) !== -1) {
+              builderSet.add(`${project["Name"]} (${project["Capability"]}) - [${project["Physical Location"]}]`); 
+            }
+          });
+        } else {
+          builderSet.add(`${project["Name"]} (${project["Capability"]}) - [${project["Physical Location"]}]`);
+        }
+      }
+    });
+    const builders = Array.from(builderSet);
+    builders.sort(); // Sort the array alphabetically
+
     return builders;
   };
 
@@ -313,7 +339,7 @@ const App = () => {
       {isLoading ? (
           <LoadingSplash />
         ) : data && data.length > 0 && clientProjects.length > 0 ? (
-          <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq])} buildCenters={lastBC} data={data}/>              
+          <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq], bc)} buildCenters={lastBC} data={data}/>              
         ) : (
           <LoadingSplash message="No Data Available"/>
         )

@@ -42,10 +42,10 @@ const ProjectStats = ({ data, buildCenters }) => {
     return uniqueValues.size;     
   }
 
-  const getBuildCenterCount = (data, buildCenters) => {
+  const getBuildCenterCount = (data, bc) => {
 
-    if (buildCenters && buildCenters.trim() !== "") {
-      const arrBuildCenters = buildCenters.split(',');        
+    if (bc && bc.trim() !== "") {
+      const arrBuildCenters = bc.split(',');        
       return arrBuildCenters.length; 
     } else {
       if (!data) {
@@ -65,18 +65,36 @@ const ProjectStats = ({ data, buildCenters }) => {
   }
 
   return (
-    <div style={{ paddingTop: '15px', paddingBottom: '5px', paddingLeft: '20px', paddingRight: '20px' }}>    
+    <div style={{ paddingTop: '5px', paddingBottom: '5px', paddingLeft: '20px', paddingRight: '20px' }}>    
       <Card style={cardStyle}>         
         <CardContent>   
-          <Grid container spacing={4}>
+            <Grid container spacing={5}>
               <Grid item xs={12} md={3}>
-                { (data && data.length > 0 && getBuildCenterCount(data, buildCenters) >= 1) ? (
+                <Typography variant="body1" style={{ textAlign: 'center' }}> 
+                  <strong>Build Centers</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  <strong>Markets</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  <strong>Projects</strong>
+                </Typography> 
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  <strong>Builders</strong>
+                </Typography>  
+              </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+              <Grid item xs={12} md={3}>
+                { (data && data.length > 0) ? (
                     <Typography variant="body1" style={{ textAlign: 'center' }}> 
-                      <strong>Build Centers ({ buildCenters }): { getBuildCenterCount(data, buildCenters) }</strong>
-                    </Typography>
-                  ) : data && data.length > 0 && getBuildCenterCount(data, buildCenters) === 0 ? (
-                    <Typography variant="body1" style={{ textAlign: 'center' }}> 
-                      <strong>Build Centers: { getBuildCenterCount(data, buildCenters) }</strong>
+                      OVERALL ({ getBuildCenterCount(data, "") })
                     </Typography>
                   ) : ( "" )
                 }
@@ -84,7 +102,7 @@ const ProjectStats = ({ data, buildCenters }) => {
               <Grid item xs={12} md={3}>
                 { data && data.length > 0 ? (
                     <Typography variant="body1" style={{ textAlign: 'center' }}>
-                      <strong>Markets: { getDistinctCountByBC(data, buildCenters, "Current Market") }</strong>
+                      { getDistinctCountByBC(data, null, "Current Market") }
                     </Typography>
                   ) : ( "" ) 
                 }
@@ -92,7 +110,7 @@ const ProjectStats = ({ data, buildCenters }) => {
               <Grid item xs={12} md={3}>
                 { data && data.length > 0 ? (
                       <Typography variant="body1" style={{ textAlign: 'center' }}>
-                        <strong>Projects: { getDistinctCountByBC(data, buildCenters, "ClientProject")}</strong>
+                        { getDistinctCountByBC(data, null, "ClientProject")}
                       </Typography> 
                   ) : ( "" ) 
                 }
@@ -100,12 +118,37 @@ const ProjectStats = ({ data, buildCenters }) => {
               <Grid item xs={12} md={3}>
                 { data && data.length > 0 ? (
                     <Typography variant="body1" style={{ textAlign: 'center' }}>
-                      <strong>Builders: { getDistinctCountByBC(data, buildCenters, "Name") }</strong>
+                      { getDistinctCountByBC(data, null, "Name") }
                     </Typography>  
                   ) : ( "" ) 
                 }
               </Grid>
           </Grid>
+          { (data && data.length > 0 && buildCenters.length >= 1) ? (
+          <Grid container spacing={5}>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}> 
+                    { buildCenters } ({ getBuildCenterCount(data, buildCenters) })
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  { getDistinctCountByBC(data, buildCenters, "Current Market") }
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  { getDistinctCountByBC(data, buildCenters, "ClientProject")}
+                </Typography> 
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography variant="body1" style={{ textAlign: 'center' }}>
+                  { getDistinctCountByBC(data, buildCenters, "Name") }
+                </Typography>  
+              </Grid>
+          </Grid>
+            ) : ( "" ) 
+          }
         </CardContent>
       </Card>
     </div>

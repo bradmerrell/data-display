@@ -77,18 +77,38 @@ const App = () => {
   const bc = query.get("BC") || ""; // Fallback value if BC is not provided
 
   // Function to extract unique Client Projects values
-  const getDistinctClientProjects = (data) => {
-    const clientProjectSet = new Set(
-      data
-        .map(item => item["ClientProject"])
-        .filter(opp => Boolean(opp) && opp.trim().length > 0 && 
-                       opp.toUpperCase() !== "NO PRIMARY" && 
-                       opp.toUpperCase() !== "LEAVE" && 
-                       opp.toUpperCase() !== "PTO" && 
-                       opp.toUpperCase() !== "BENCH")
-    );
+  const getDistinctClientProjects = (data, bc) => {
+    var arrBuildCenters = [];
+    // Create a set to store unique values of the specified field
+    const clientProjectSet = new Set();
+    if (bc && bc.trim() !== "") {
+      arrBuildCenters = bc.split(',');    
+    }
+    if (!data) {
+      return [];
+    }
+      
+    // Iterate through the array and add the field values to the set
+    data.forEach(project => {
+      if (project["ClientProject"].trim().length > 0 &&
+        project["ClientProject"].trim().toUpperCase() !== "NO PRIMARY" && 
+        project["ClientProject"].trim().toUpperCase() !== "LEAVE" && 
+        project["ClientProject"].trim().toUpperCase() !== "PTO" && 
+        project["ClientProject"].trim().toUpperCase() !== "BENCH") {
+        if (arrBuildCenters.length > 0) {
+          arrBuildCenters.forEach(builderCenter => {
+            if (builderCenter.indexOf(project["BC"]) !== -1) {
+              clientProjectSet.add(project["ClientProject"]); 
+            }
+          });
+        } else {
+          clientProjectSet.add(project["ClientProject"]);
+        }
+      }
+    });
     const uniqueClientProjects = Array.from(clientProjectSet);
     uniqueClientProjects.sort(); // Sort the array alphabetically
+    
     return uniqueClientProjects;
   };
   
@@ -183,9 +203,9 @@ const App = () => {
   
   const fetchDataFromAPI = useCallback(async () => {
     var url = `${process.env.REACT_APP_DATA_API_GET}`;
-    if (bc != null && bc.length > 0) {
-      url = url + `&BC=${bc}`;
-    }
+    // if (bc != null && bc.length > 0) {
+    //   url = url + `&BC=${bc}`;
+    // }
     try {
       const response = await axios.get(url, {
         headers: {
@@ -197,7 +217,7 @@ const App = () => {
       console.error("Error fetching data:", error);
       throw error; // Re-throw the error for handling in the caller
     }
-  }, [bc]); // Add necessary dependencies
+  }, [/*bc*/]); // Add necessary dependencies
 
   const fetchLastModifiedFromAPI = useCallback(async () => {
     var url = `${process.env.REACT_APP_DATA_API_UPLOAD}`;
@@ -226,7 +246,7 @@ const App = () => {
       const data = await fetchDataFromAPI();      
       const lastModifiedDate = await fetchLastModifiedFromAPI();
       setData(data);      
-      setClientProjects(getDistinctClientProjects(data));      
+      setClientProjects(getDistinctClientProjects(data, bc));      
       setLastBC(bc); // Update lastBC after successful fetch  
       setBcCount(getBuildCenterCount(data, bc));    
       setBuilderCount(getDistinctCountByBC(data, bc, "Name"));      
@@ -292,7 +312,7 @@ const App = () => {
       <FileUploadDialog open={isDialogOpen} onClose={handleCloseDialog} />
       {isLoading ? (
           <LoadingSplash />
-        ) : data && data.length > 0 ? (
+        ) : data && data.length > 0 && clientProjects.length > 0 ? (
           <ProjectDisplay projectRow={getFirstRowByClientProject(data, clientProjects[seq])} builderList={getListOfBuilders(data, clientProjects[seq])} buildCenters={lastBC} data={data}/>              
         ) : (
           <LoadingSplash message="No Data Available"/>
